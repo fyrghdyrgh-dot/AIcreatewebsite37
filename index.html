@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI 教育/题库工具导航站｜出题·讲义·批改·大纲</title>
+  <meta name="description" content="AI 教育/题库工具导航站：把出题、讲义、作业批改与课程大纲放到同一入口。支持分类、搜索、收藏与推荐；纯前端单页可直接部署。" />
+  <meta property="og:title" content="AI 教育/题库工具导航站" />
+  <meta property="og:description" content="出题·讲义·作业批改·课程大纲，一站式入口。" />
+  <meta property="og:type" content="website" />
+  <style>
+    :root{
+      --bg:#ffffff;
+      --panel:#ffffff;
+      --panel2:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:rgba(15,23,42,.10);
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --accent:#0ea5e9;
+      --accent2:#0284c7;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --radius:12px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: var(--bg);
+      color:var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      line-height:1.5;
+    }
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1180px;margin:0 auto;padding:14px}
+    .topbar{
+      position:sticky;top:0;z-index:20;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.82);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{display:flex;align-items:center;gap:14px;justify-content:space-between;padding:14px 20px;max-width:1180px;margin:0 auto}
+    .brand{display:flex;align-items:center;gap:10px;min-width:240px}
+    .logo{
+      width:34px;height:34px;border-radius:10px;
+      background: radial-gradient(12px 12px at 30% 30%, rgba(255,255,255,.35), transparent 60%),
+                  linear-gradient(135deg, rgba(14,165,233,1), rgba(34,197,94,.75));
+      box-shadow: 0 10px 20px rgba(14,165,233,.22);
+    }
+    .brand-title{font-weight:800;letter-spacing:.2px}
+    .brand-sub{font-size:12px;color:var(--muted);margin-top:1px}
+    .brand-text{display:flex;flex-direction:column;line-height:1.1}
+    .actions{display:flex;align-items:center;gap:10px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      border:1px solid var(--line);
+      background: rgba(248,250,252,.9);
+      color:var(--text);
+      border-radius:999px;
+      padding:10px 14px;
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(14,165,233,.35)}
+    .btn.primary{background: linear-gradient(135deg, rgba(14,165,233,1), rgba(34,197,94,.95)); border-color: rgba(14,165,233,.35); color:#fff}
+    .btn.ghost{background:transparent}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:7px 10px;border-radius:999px;
+      background: rgba(248,250,252,.9);
+      border:1px solid var(--line);
+      font-size:12px;color:rgba(15,23,42,.82);
+    }
+    .pill b{color:var(--accent2)}
+    .layout{display:grid;grid-template-columns: 1fr 320px;gap:18px;margin-top:12px}
+    .panel{
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .panel.pad{padding:14px}
+    .hero-banner{
+      border-radius: 18px;
+      background:
+        radial-gradient(700px 300px at 15% 20%, rgba(14,165,233,.55), transparent 55%),
+        radial-gradient(700px 300px at 85% 15%, rgba(34,197,94,.45), transparent 58%),
+        radial-gradient(420px 220px at 30% 80%, rgba(2,132,199,.30), transparent 60%),
+        linear-gradient(135deg, #07151f, #04334a);
+      box-shadow: 0 18px 60px rgba(15,23,42,.16);
+      padding: 14px 12px 16px;
+    }
+    .hero-inner{max-width: 980px; margin: 0 auto; text-align:center}
+    .hero-title{font-size:22px; letter-spacing:.2px; margin:0; font-weight:860}
+    .hero-title{color:#fff}
+    .hero-search{
+      margin: 12px auto 0;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      width: min(760px, 100%);
+      padding: 12px 14px;
+      border-radius: 999px;
+      background: rgba(2,6,23,.58);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 20px 60px rgba(2,6,23,.28);
+    }
+    .hero-search svg{opacity:.90;color:rgba(255,255,255,.92)}
+    .hero-search input{
+      flex:1;
+      border:0;
+      outline:0;
+      background:transparent;
+      color: rgba(255,255,255,.95);
+      font-size: 14px;
+    }
+    .hero-search input::placeholder{color: rgba(226,232,240,.82)}
+    .hero-meta{
+      margin: 10px auto 0;
+      width: min(760px, 100%);
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      color: rgba(226,232,240,.82);
+      font-size: 12px;
+    }
+    .hero-meta b{color:#fff}
+    .quick-tools{
+      margin: 12px auto 0;
+      width: min(980px, 100%);
+      display:grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap:10px;
+    }
+    .quick-tool{
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.92);
+      border-radius: 14px;
+      padding: 10px 10px 12px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height: 74px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    }
+    .quick-tool:hover{transform: translateY(-2px); border-color: rgba(14,165,233,.22); box-shadow: 0 14px 30px rgba(15,23,42,.08)}
+    .qt-ico{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(135deg, rgba(14,165,233,.16), rgba(34,197,94,.12));
+      color: rgba(2,132,199,.95);
+      overflow:hidden;
+    }
+    .qt-ico img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .qt-name{font-size:12px; color: rgba(15,23,42,.82); text-align:center; line-height:1.2}
+    .recommend-wrap{
+      margin-top: 12px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 18px;
+      box-shadow: 0 18px 60px rgba(15,23,42,.10);
+      overflow:hidden;
+    }
+    .recommend-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+      color: rgba(15,23,42,.78);
+      font-size:12.5px;
+    }
+    .recommend-head b{color: rgba(15,23,42,.92)}
+    .recommend-head a{color: var(--accent2)}
+    .recommend-left{display:flex;flex-direction:column;gap:6px;min-width:0}
+    .recommend-tabs{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .seg{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(248,250,252,.95);
+      color: rgba(15,23,42,.78);
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .seg:hover{transform: translateY(-1px); border-color: rgba(14,165,233,.22)}
+    .seg.active{background: rgba(14,165,233,.10); border-color: rgba(14,165,233,.22); color: rgba(2,132,199,.95)}
+    .recommend-desc{font-size:12px;color: rgba(15,23,42,.70);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .recommend-body{padding: 10px 12px 12px}
+    .rec-grid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap:14px;
+    }
+    .rec-card{
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.96);
+      border-radius: 14px;
+      padding: 14px;
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      min-height: 92px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    }
+    .rec-card:hover{transform: translateY(-2px); border-color: rgba(14,165,233,.22); box-shadow: 0 14px 30px rgba(15,23,42,.08)}
+    .rec-icon{
+      width:46px;height:46px;border-radius:16px;
+      display:flex;align-items:center;justify-content:center;
+      background: linear-gradient(135deg, rgba(14,165,233,.16), rgba(34,197,94,.12));
+      color: rgba(2,132,199,.95);
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+    .rec-icon img{width:100%;height:100%;object-fit:cover;display:block}
+    .rec-icon svg{width:22px;height:22px}
+    .rec-text{min-width:0;display:flex;flex-direction:column;gap:4px}
+    .rec-name{font-weight:800;font-size:13px;color: rgba(15,23,42,.92);line-height:1.2}
+    .rec-sub{font-size:12px;color: rgba(100,116,139,.92);white-space:normal;overflow:visible;line-height:1.35}
+    .rec-hint{margin-top:10px;font-size:12px;color: rgba(100,116,139,.92)}
+    .tabs{
+      display:flex;
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      -webkit-overflow-scrolling: touch;
+      gap:8px;
+      padding:10px 12px;
+      border-top:1px solid var(--line);
+    }
+    .tab{
+      padding:8px 10px;border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(248,250,252,.95);
+      color: rgba(15,23,42,.84);
+      font-size:12px;
+      white-space:nowrap;
+      cursor:pointer;
+      transition: background .12s ease, border-color .12s ease, transform .12s ease;
+    }
+    .tab:hover{transform: translateY(-1px); border-color: rgba(14,165,233,.22)}
+    .tab.active{
+      background: rgba(14,165,233,.10);
+      border-color: rgba(14,165,233,.25);
+      color: rgba(15,23,42,.92);
+    }
+    .cat-quick{
+      display:flex;
+      gap:10px;
+      padding: 10px 12px 12px;
+      border-top: 1px solid var(--line);
+      overflow-x:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .cat-btn{
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.92);
+      border-radius: 14px;
+      padding: 9px 10px 10px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      user-select:none;
+      min-width: 92px;
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    }
+    .cat-btn:hover{transform: translateY(-2px); border-color: rgba(14,165,233,.22); box-shadow: 0 14px 30px rgba(15,23,42,.08)}
+    .cat-btn.active{border-color: rgba(14,165,233,.28); box-shadow: 0 14px 30px rgba(14,165,233,.10)}
+    .cat-ico{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(135deg, rgba(14,165,233,.16), rgba(34,197,94,.12));
+      color: rgba(2,132,199,.95);
+    }
+    .cat-name{font-size:12px; color: rgba(15,23,42,.80); text-align:center; line-height:1.2}
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:12px;
+      padding:14px 16px 16px;
+      border-top:1px solid var(--line);
+    }
+    .card{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.96);
+      border-radius: var(--radius);
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height: 150px;
+      transition: transform .12s ease, border-color .12s ease;
+    }
+    .card:hover{transform: translateY(-2px); border-color: rgba(14,165,233,.25)}
+    .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .card-title{font-weight:800;font-size:13.5px;margin:0}
+    .card-desc{margin:0;color:var(--muted);font-size:12.5px}
+    .tags{display:flex;flex-wrap:wrap;gap:6px}
+    .tag{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(248,250,252,.95);
+      color: rgba(15,23,42,.72);
+    }
+    .card-actions{display:flex;align-items:center;gap:8px;margin-top:auto}
+    .mini{
+      padding:8px 10px;border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(248,250,252,.95);
+      color: rgba(15,23,42,.86);
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+    }
+    .mini.primary{
+      background: rgba(14,165,233,.10);
+      border-color: rgba(14,165,233,.22);
+    }
+    .mini:hover{border-color: rgba(14,165,233,.28)}
+    .star{
+      width:34px;height:34px;border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(248,250,252,.95);
+      cursor:pointer;
+      display:inline-flex;align-items:center;justify-content:center;
+    }
+    .star[aria-pressed="true"]{border-color: rgba(14,165,233,.30); background: rgba(14,165,233,.10)}
+    .muted{color:var(--muted)}
+    .rightcol{display:flex;flex-direction:column;gap:12px}
+    .ad{
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.96);
+      padding:12px;
+    }
+    .ad-top{margin:16px 0 0}
+    .ad-label{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px
+    }
+    .ad-label span{font-size:12px;color:rgba(15,23,42,.72)}
+    .badge{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(14,165,233,.22);
+      background: rgba(14,165,233,.10);
+      color: rgba(2,132,199,.95);
+    }
+    .ad-slot{
+      border-radius: 10px;
+      background: rgba(248,250,252,.9);
+      border:1px solid rgba(15,23,42,.08);
+      padding:12px;
+      color: rgba(15,23,42,.84);
+      font-size:12.5px;
+      line-height:1.55;
+    }
+    .ad-slot b{color:rgba(15,23,42,.92)}
+    .stat{
+      display:flex;gap:10px;flex-wrap:wrap
+    }
+    .stat .pill{background: rgba(255,255,255,.85)}
+    .foot{
+      margin:18px 0 30px;
+      padding:14px 16px;
+      border-top:1px solid var(--line);
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    }
+    .foot a{color:rgba(15,23,42,.78)}
+    .foot a:hover{color:rgba(15,23,42,.92)}
+    .divider{width:1px;height:12px;background: var(--line)}
+    .toast{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 18px;
+      background: rgba(15,23,42,.92);
+      border: 1px solid rgba(15,23,42,.18);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.96);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 60;
+      max-width: calc(100vw - 24px);
+      text-align:center;
+    }
+    .toast.show{opacity:1; transform: translateX(-50%) translateY(-6px)}
+    .left-ad{
+      position: fixed;
+      left: 14px;
+      top: 120px;
+      z-index: 30;
+      width: 210px;
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 16px;
+      background: rgba(255,255,255,.94);
+      box-shadow: 0 18px 60px rgba(15,23,42,.10);
+      overflow:hidden;
+    }
+    .left-ad-head{
+      padding: 10px 10px 0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .left-ad-title{font-weight:860;font-size:13px;color: rgba(15,23,42,.92)}
+    .left-ad-body{padding: 10px}
+    .left-ad-body p{margin:0;color: rgba(100,116,139,.92);font-size:12px;line-height:1.55}
+    .left-ad-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .left-ad .mini{padding:7px 10px}
+    @media (max-width: 1220px){
+      .left-ad{display:none}
+    }
+    .float-cta{
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 55;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:flex-end;
+    }
+    .fab{
+      border-radius: 999px;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, rgba(14,165,233,1), rgba(34,197,94,.95));
+      color: white;
+      border: 1px solid rgba(14,165,233,.55);
+      box-shadow: 0 18px 40px rgba(14,165,233,.22);
+      cursor:pointer;
+      font-size: 13px;
+      display:inline-flex;align-items:center;gap:8px;
+      user-select:none;
+    }
+    .fab.secondary{
+      background: rgba(255,255,255,.92);
+      color: rgba(15,23,42,.86);
+      border-color: rgba(15,23,42,.12);
+      box-shadow: var(--shadow);
+    }
+    .inline-ad{
+      grid-column: 1 / -1;
+      border-radius: var(--radius);
+      overflow:hidden;
+    }
+    @media (max-width: 980px){
+      .layout{grid-template-columns: 1fr}
+      .rightcol{order:-1}
+      .brand{min-width:0}
+    }
+    @media (max-width: 860px){
+      .grid{grid-template-columns: repeat(2, minmax(0, 1fr))}
+    }
+    @media (max-width: 520px){
+      .topbar-inner{flex-wrap:wrap}
+      .brand{width:100%}
+      .actions{width:100%;justify-content:flex-end}
+      .grid{grid-template-columns: 1fr}
+      .float-cta{right: 12px; bottom: 12px}
+      .hero-title{font-size:22px}
+    }
+    @media (max-width: 980px){
+      .quick-tools{grid-template-columns: repeat(4, minmax(0, 1fr))}
+      .rec-grid{grid-template-columns: repeat(2, minmax(0, 1fr))}
+    }
+    @media (max-width: 720px){
+      .rec-grid{grid-template-columns: repeat(1, minmax(0, 1fr))}
+    }
+  </style>
+</head>
+<body>
+  <aside class="left-ad" aria-label="侧边广告">
+    <div class="left-ad-head">
+      <div class="left-ad-title">1bgp 服务器方案</div>
+      <span class="badge">赞助</span>
+    </div>
+    <div class="left-ad-body">
+      <p>适合部署 AI 题库站、讲义站、作业批改台；也可搭建“龙虾站”引流页，或对接 ChatGPT 等模型做教学助手。</p>
+      <div class="left-ad-actions">
+        <a class="mini primary" href="https://www.1bgp.com/" target="_blank" rel="noopener noreferrer" data-event="leftad_primary">去官网选型</a>
+        <a class="mini" href="https://www.1bgp.com/" target="_blank" rel="noopener noreferrer" data-event="leftad_secondary">查看套餐</a>
+      </div>
+    </div>
+  </aside>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="brand-text">
+          <div class="brand-title">AI 教育/题库工具导航</div>
+          <div class="brand-sub">出题 · 讲义 · 批改 · 大纲</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost" id="showFavs" data-event="nav_show_favs" type="button">只看收藏</button>
+        <button class="btn primary" id="submitTool" data-event="nav_submit_tool" type="button">部署到 1bgp</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero-banner" aria-label="搜索区域">
+      <div class="hero-inner">
+        <h1 class="hero-title">AI 教育工具导航：把备课到批改放进一个入口</h1>
+
+        <div class="hero-search" role="search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2" opacity=".95"/>
+            <path d="M16.2 16.2 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".95"/>
+          </svg>
+          <input id="q" type="text" autocomplete="off" placeholder="搜索：出题/题型/讲义/解析/Rubric/错题/大纲/课堂互动…" />
+        </div>
+
+        <div class="hero-meta">
+          <span>当前分类：<b id="activeCat">全部</b></span>
+          <span>匹配结果：<b id="count">0</b></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="recommend-wrap" aria-label="推荐工具">
+      <div class="recommend-head">
+        <div class="recommend-left">
+          <div class="recommend-tabs" role="tablist" aria-label="推荐切换">
+            <button class="seg active" type="button" data-rec="recommend" data-event="rec_tab_recommend" aria-selected="true">推荐入口</button>
+            <button class="seg" type="button" data-rec="recent" data-event="rec_tab_recent" aria-selected="false">最近使用</button>
+          </div>
+          <div class="recommend-desc" id="recommendDesc">从“出题→讲义→批改→大纲”一路打通：点开即用，模板可复制，口径可复用。</div>
+        </div>
+        <div></div>
+      </div>
+      <div class="recommend-body">
+        <div class="rec-grid" id="recommendGrid" aria-label="推荐工具列表"></div>
+        <div class="rec-hint" id="recommendHint" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <section class="panel" aria-label="工具列表">
+        <div class="tabs" id="tabs" role="tablist" aria-label="分类筛选"></div>
+        <div class="cat-quick" id="catQuick" aria-label="分类图标"></div>
+        <div class="grid" id="grid" aria-live="polite"></div>
+
+        <div class="foot">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span class="muted">© <span id="year"></span> AI 教育/题库工具导航</span>
+            <span class="divider" aria-hidden="true"></span>
+            <a href="#" id="openDisclaimer" data-event="open_disclaimer">免责声明</a>
+            <span class="divider" aria-hidden="true"></span>
+            <a href="#" id="openPrivacy" data-event="open_privacy">隐私政策</a>
+          </div>
+          <div class="muted">外链仅供参考，教学内容与合规请自行甄别。</div>
+        </div>
+      </section>
+
+      <aside class="rightcol" aria-label="侧栏">
+        <section class="panel pad">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <div>
+              <div style="font-weight:800">1bgp 全球云服务器 / 物理服务器</div>
+              <div class="muted" style="font-size:12px;margin-top:4px">部署题库站 · 讲义站 · 批改台 · 教学助手</div>
+            </div>
+            <span class="badge">推荐</span>
+          </div>
+          <div class="muted" style="font-size:12.5px;margin-top:10px;line-height:1.7">
+            适合：AI 教育工具导航、题库内容管理、作业批改服务、教研台账与长期运行的教学应用；也可搭建“龙虾站”引流页，或对接 ChatGPT 等模型做教学助手。
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+            <a class="mini primary" href="https://www.1bgp.com/" target="_blank" rel="noopener noreferrer" data-event="cta_1bgp_primary">去官网选型</a>
+            <a class="mini" href="https://www.1bgp.com/" target="_blank" rel="noopener noreferrer" data-event="cta_1bgp_secondary">查看报价</a>
+          </div>
+        </section>
+
+        <section class="panel pad" style="margin-top:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <div>
+              <div style="font-weight:800">sproidc 云服务器 / 独立服务器</div>
+              <div class="muted" style="font-size:12px;margin-top:4px">更适合课堂高峰 · 稳定节点 · 快速上线</div>
+            </div>
+            <span class="badge">备选</span>
+          </div>
+          <div class="muted" style="font-size:12.5px;margin-top:10px;line-height:1.7">
+            适合：课堂互动、作业提交高峰、讲义站与题库站；支持多地区线路与带宽方案，面向不同地区学生访问更顺滑。
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+            <a class="mini primary" href="https://www.sproidc.com/" target="_blank" rel="noopener noreferrer" data-event="cta_sproidc_primary">查看方案</a>
+            <a class="mini" href="https://www.sproidc.com/" target="_blank" rel="noopener noreferrer" data-event="cta_sproidc_secondary">进入官网</a>
+          </div>
+        </section>
+
+        <section class="panel pad ad-top" aria-label="AI 教研上手">
+          <div style="font-weight:800">AI 教研上手路径</div>
+          <div class="muted" style="font-size:12.5px;margin-top:10px;line-height:1.7">
+            1) 先定教学目标与知识点 → 2) 出题分层（基础/提高/挑战） → 3) 讲义结构（导入/例题/练习/易错点） → 4) Rubric 与反馈口径 → 5) 课程大纲与测验节奏。
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <div class="float-cta">
+    <a class="fab" id="fabMain" href="https://www.1bgp.com/" target="_blank" rel="noopener noreferrer" data-event="fab_1bgp">查看 1bgp 服务器</a>
+    <button class="fab secondary" id="fabTop" data-event="fab_back_top" type="button">回到顶部</button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const EVENT_PREFIX = "edu1_";
+    const tools = [
+      { name: "ChatGPT", desc: "生成题目、讲义讲解、课堂提问与批改反馈（可用 Rubric 约束口径）。", url: "https://chat.openai.com", cat: "出题/题库", tags: ["出题","讲义","批改"] , icon: "https://www.iliudar.com/api/icon?url=https%3A%2F%2Fchat.openai.com&v=2"},
+      { name: "Kimi", desc: "长文阅读与资料总结：把教材/讲义变成可用的课堂要点与练习。", url: "https://kimi.moonshot.cn", cat: "讲义/备课", tags: ["总结","教材","备课"] , icon: "https://www.iliudar.com/api/icon?url=https%3A%2F%2Fkimi.moonshot.cn&v=2"},
+      { name: "Claude", desc: "长文本结构化：把教案拆成目标-活动-评价，适合写讲义与评语。", url: "https://claude.ai", cat: "讲义/备课", tags: ["结构化","教案","评语"] , icon: "https://www.iliudar.com/api/icon?url=https%3A%2F%2Fclaude.ai&v=2"},
+      { name: "Perplexity", desc: "检索增强问答：快速查资料、找案例与引用（用于讲义补充）。", url: "https://www.perplexity.ai", cat: "资源库/素材", tags: ["检索","引用","案例"] },
+      { name: "Notion", desc: "教研知识库与题库台账：版本、标签、检索与协作。", url: "https://www.notion.so", cat: "教研运营", tags: ["知识库","协作","台账"] },
+      { name: "Google Docs", desc: "协作写讲义/教案：多人评审与统一口径。", url: "https://docs.google.com", cat: "教研运营", tags: ["协作","文档","评审"] },
+      { name: "Google Sheets", desc: "题库覆盖率与测验节奏表：知识点×题型×难度的网格管理。", url: "https://docs.google.com/spreadsheets", cat: "学习分析", tags: ["覆盖率","网格","节奏"] },
+      { name: "Canva", desc: "讲义排版与课堂卡片：快速把内容做成可投屏/可打印素材。", url: "https://www.canva.com", cat: "资源库/素材", tags: ["排版","素材","卡片"] },
+      { name: "Quizlet", desc: "闪卡与测验：把知识点做成练习与复习卡。", url: "https://quizlet.com", cat: "课堂互动", tags: ["闪卡","测验","复习"] },
+      { name: "Kahoot!", desc: "课堂答题互动：快速做小测与抢答。", url: "https://kahoot.com", cat: "课堂互动", tags: ["互动","抢答","小测"] },
+      { name: "Socrative", desc: "课堂即时测验：收集回答、导出结果。", url: "https://www.socrative.com", cat: "课堂互动", tags: ["测验","统计","课堂"] },
+      { name: "Edpuzzle", desc: "视频课程互动：在视频里插题，自动收集答题数据。", url: "https://edpuzzle.com", cat: "课堂互动", tags: ["视频","插题","数据"] },
+      { name: "Google Classroom", desc: "布置作业与收集提交：适合轻量班级管理。", url: "https://classroom.google.com", cat: "家校沟通", tags: ["作业","班级","管理"] },
+      { name: "Moodle", desc: "开源 LMS：课程、测验、作业与成绩管理（可自部署）。", url: "https://moodle.org", cat: "家校沟通", tags: ["LMS","开源","自部署"] },
+      { name: "Canvas LMS", desc: "课程管理系统：作业、测验、评分与讨论。", url: "https://www.instructure.com/canvas", cat: "家校沟通", tags: ["课程","评分","讨论"] },
+      { name: "Desmos", desc: "数学可视化与互动：做函数探索与练习。", url: "https://www.desmos.com", cat: "资源库/素材", tags: ["数学","可视化","互动"] },
+      { name: "GeoGebra", desc: "几何与代数可视化：适合课堂演示与练习。", url: "https://www.geogebra.org", cat: "资源库/素材", tags: ["几何","可视化","演示"] },
+      { name: "Wolfram|Alpha", desc: "计算与推导：辅助解析题目与生成变式思路。", url: "https://www.wolframalpha.com", cat: "出题/题库", tags: ["计算","解析","变式"] },
+      { name: "Grammarly", desc: "英文写作纠错与润色：适合作文批改与反馈口径。", url: "https://www.grammarly.com", cat: "作业批改", tags: ["作文","纠错","润色"] },
+      { name: "QuillBot", desc: "改写与降重：生成多版本讲义表达与例句。", url: "https://quillbot.com", cat: "讲义/备课", tags: ["改写","表达","例句"] },
+      { name: "Turnitin", desc: "学术查重与写作反馈（学校常用）。", url: "https://www.turnitin.com", cat: "作业批改", tags: ["查重","写作","反馈"] },
+      { name: "Overleaf", desc: "LaTeX 协作：排版试卷/讲义（公式友好）。", url: "https://www.overleaf.com", cat: "资源库/素材", tags: ["排版","公式","协作"] },
+      { name: "GitBook", desc: "在线教材与讲义站：把内容做成可检索的课程文档。", url: "https://www.gitbook.com", cat: "讲义/备课", tags: ["文档站","检索","课程"] },
+      { name: "Miro", desc: "在线白板：知识结构图、教学流程与活动设计。", url: "https://miro.com", cat: "讲义/备课", tags: ["白板","结构","活动"] },
+      { name: "Excalidraw", desc: "手绘风板书图：做概念图、流程图与课堂讲解图。", url: "https://excalidraw.com", cat: "讲义/备课", tags: ["板书","图","流程"] },
+      { name: "Tally", desc: "课后反馈与测验表单：收集学习困难点。", url: "https://tally.so", cat: "学习分析", tags: ["表单","反馈","收集"] },
+      { name: "Hotjar", desc: "学习页面行为洞察：看哪里卡住、哪里跳出。", url: "https://www.hotjar.com", cat: "学习分析", tags: ["行为","热力图","优化"] },
+      { name: "Metabase", desc: "学习数据看板：把作业/测验数据做成可视化复盘。", url: "https://www.metabase.com", cat: "学习分析", tags: ["看板","复盘","数据"] }
+    ];
+
+    tools.unshift(
+      { name: "题型分层模板", desc: "把知识点拆成基础/提高/挑战三层，稳定出题难度曲线。", url: "https://www.notion.so", cat: "出题/题库", tags: ["分层","难度","模板"] },
+      { name: "Rubric 评分表", desc: "统一批改口径：评分点、扣分规则、反馈语句库。", url: "https://docs.google.com", cat: "作业批改", tags: ["rubric","口径","反馈"] },
+      { name: "课程大纲生成器", desc: "把目标→单元→课时→测验节奏串起来，产出周计划。", url: "https://chat.openai.com", cat: "课程大纲", tags: ["周计划","节奏","测验"] }
+    );
+
+    const LS_KEY = "aiedu1:favs";
+    const REC_KEY = "aiedu1:recent";
+    const state = {
+      activeCat: "全部",
+      q: "",
+      favOnly: false,
+      favs: new Set()
+    };
+
+    const els = {
+      q: document.getElementById("q"),
+      tabs: document.getElementById("tabs"),
+      catQuick: document.getElementById("catQuick"),
+      grid: document.getElementById("grid"),
+      activeCat: document.getElementById("activeCat"),
+      count: document.getElementById("count"),
+      showFavs: document.getElementById("showFavs"),
+      year: document.getElementById("year"),
+      toast: document.getElementById("toast"),
+      fabMain: document.getElementById("fabMain"),
+      fabTop: document.getElementById("fabTop"),
+      submitTool: document.getElementById("submitTool"),
+      openDisclaimer: document.getElementById("openDisclaimer"),
+      openPrivacy: document.getElementById("openPrivacy"),
+      recommendGrid: document.getElementById("recommendGrid"),
+      recommendDesc: document.getElementById("recommendDesc"),
+      recommendHint: document.getElementById("recommendHint")
+    };
+
+    function getCategories(items){
+      const set = new Set(items.map(x => x.cat));
+      return ["全部", ...Array.from(set).sort((a,b) => a.localeCompare(b, "zh-Hans-CN"))];
+    }
+
+    function normalize(s){return (s || "").toLowerCase().trim();}
+
+    function matchesQuery(item, q){
+      if(!q) return true;
+      const hay = [
+        item.name,
+        item.desc,
+        item.cat,
+        ...(item.tags || [])
+      ].join(" ").toLowerCase();
+      return hay.includes(q);
+    }
+
+    function shouldShow(item){
+      if(state.activeCat !== "全部" && item.cat !== state.activeCat) return false;
+      if(state.favOnly && !state.favs.has(item.name)) return false;
+      if(!matchesQuery(item, state.q)) return false;
+      return true;
+    }
+
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function toast(msg){
+      els.toast.textContent = msg;
+      els.toast.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => els.toast.classList.remove("show"), 1600);
+    }
+
+    function track(el){
+      const ev = el?.dataset?.event;
+      if(!ev) return;
+      window.__events = window.__events || [];
+      window.__events.push({ event: EVENT_PREFIX + ev, ts: Date.now() });
+    }
+
+    function saveFavs(){
+      localStorage.setItem(LS_KEY, JSON.stringify(Array.from(state.favs)));
+    }
+
+    function loadFavs(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return;
+        const arr = JSON.parse(raw);
+        if(Array.isArray(arr)) state.favs = new Set(arr);
+      }catch(_){}
+    }
+
+    function loadRecents(){
+      try{
+        const raw = localStorage.getItem(REC_KEY);
+        if(!raw) return [];
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr.filter(Boolean) : [];
+      }catch(_){
+        return [];
+      }
+    }
+
+    function saveRecents(list){
+      try{
+        localStorage.setItem(REC_KEY, JSON.stringify(list.slice(0, 12)));
+      }catch(_){}
+    }
+
+    function pushRecent(name){
+      if(!name) return;
+      const list = loadRecents();
+      const next = [name, ...list.filter(x => x !== name)].slice(0, 12);
+      saveRecents(next);
+    }
+
+    function updateCounts(filteredCount){
+      if(typeof filteredCount === "number") els.count.textContent = String(filteredCount);
+    }
+
+    function renderTabs(){
+      const categories = getCategories(tools);
+      els.tabs.innerHTML = categories.map(cat => {
+        const active = cat === state.activeCat ? "active" : "";
+        return `<button class="tab ${active}" type="button" role="tab" aria-selected="${active ? "true" : "false"}" data-cat="${escapeHtml(cat)}" data-event="tab_${escapeHtml(cat)}">${escapeHtml(cat)}</button>`;
+      }).join("");
+    }
+
+    function iconSvg(cat){
+      const map = {
+        "出题/题库": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 4h10a2 2 0 0 1 2 2v14H7a2 2 0 0 0-2 2V6a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2"/><path d="M9 8h8M9 12h8M9 16h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+        "讲义/备课": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5h12a3 3 0 0 1 3 3v11H7a3 3 0 0 0-3 3V5Z" stroke="currentColor" stroke-width="2"/><path d="M8 9h7M8 13h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+        "作业批改": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 7h10v14H7V7Z" stroke="currentColor" stroke-width="2"/><path d="M9 3h6v4H9V3Z" stroke="currentColor" stroke-width="2"/><path d="m9 14 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+        "课程大纲": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 4h12v16H6V4Z" stroke="currentColor" stroke-width="2"/><path d="M9 8h6M9 12h6M9 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+        "课堂互动": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5h16v10H7l-3 3V5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 9h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+        "学习分析": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 19h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 16v-5m4 5V7m4 9v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+        "家校沟通": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 18a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H11l-4 3v-3H7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`,
+        "资源库/素材": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" fill="currentColor" opacity=".9"/><path d="M4 16l4-4 4 4 3-3 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+        "教研运营": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 3 8v8l9 5 9-5V8l-9-5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 12 3 8m9 4 9-4" stroke="currentColor" stroke-width="2" opacity=".85"/></svg>`
+      };
+      return map[cat] || `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="currentColor" stroke-width="2"/><path d="M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+    }
+
+    function toolIconSvg(){
+      return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="currentColor" stroke-width="2"/><path d="M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+    }
+
+    function toolIconHtml(tool){
+      if(tool?.icon){
+        return `<img src="${escapeHtml(tool.icon)}" alt="${escapeHtml(tool.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-icon-name="${escapeHtml(tool.name)}" />`;
+      }
+      return toolIconSvg();
+    }
+
+    function attachIconFallback(root){
+      if(!root) return;
+      root.querySelectorAll('img[data-icon-name]').forEach(img => {
+        img.addEventListener("error", () => {
+          const wrap = img.parentElement;
+          if(!wrap) return;
+          wrap.innerHTML = toolIconSvg();
+        }, { once: true });
+      });
+    }
+
+    function renderRecommend(mode){
+      const prefer = ["课程大纲生成器","题型分层模板","Rubric 评分表","ChatGPT","Kimi","Claude","Perplexity","Notion","Canva","Quizlet","Kahoot!","Google Classroom"];
+      let list = [];
+      if(mode === "recent"){
+        const recentNames = loadRecents();
+        list = recentNames.map(n => tools.find(t => t.name === n)).filter(Boolean);
+        if(els.recommendDesc) els.recommendDesc.textContent = "你最近点过的工具（本地记录，不上传）。";
+        if(els.recommendHint) els.recommendHint.textContent = list.length ? "" : "暂无最近使用记录。点击下方工具卡片后，这里会自动出现。";
+      }else{
+        const picked = [];
+        for(const n of prefer){
+          const t = tools.find(x => x.name === n);
+          if(t) picked.push(t);
+        }
+        for(const t of tools){
+          if(!picked.some(x => x.name === t.name)) picked.push(t);
+        }
+        list = picked;
+        if(els.recommendDesc) els.recommendDesc.textContent = "优先推荐“出题/讲义/批改/大纲”常用入口，向下滚动可继续浏览。";
+        if(els.recommendHint) els.recommendHint.textContent = "";
+      }
+
+      if(!els.recommendGrid) return;
+      els.recommendGrid.innerHTML = list.slice(0, 12).map(t => `
+        <a class="rec-card" href="${escapeHtml(t.url)}" target="_blank" rel="noopener noreferrer" data-event="rec_open_${escapeHtml(t.name)}" data-tool="${escapeHtml(t.name)}" aria-label="${escapeHtml(t.name)}">
+          <span class="rec-icon">${toolIconHtml(t)}</span>
+          <span class="rec-text">
+            <span class="rec-name">${escapeHtml(t.name)}</span>
+            <span class="rec-sub">${escapeHtml(t.desc || "")}</span>
+          </span>
+        </a>
+      `).join("");
+      attachIconFallback(els.recommendGrid);
+
+      els.recommendGrid.querySelectorAll("a").forEach(a => {
+        a.addEventListener("click", (e) => {
+          track(e.currentTarget);
+          const name = e.currentTarget.getAttribute("data-tool") || "";
+          pushRecent(name);
+        });
+      });
+    }
+
+    function renderCatQuick(){
+      if(!els.catQuick) return;
+      const categories = getCategories(tools).filter(x => x !== "全部");
+      const list = categories.slice(0, 16);
+      els.catQuick.innerHTML = list.map(cat => {
+        const active = cat === state.activeCat ? "active" : "";
+        return `
+          <button class="cat-btn ${active}" type="button" data-cat="${escapeHtml(cat)}" data-event="cat_${escapeHtml(cat)}" aria-label="${escapeHtml(cat)}">
+            <span class="cat-ico">${iconSvg(cat)}</span>
+            <span class="cat-name">${escapeHtml(cat)}</span>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function renderInlineAd(){
+      return `
+        <div class="ad inline-ad panel" role="region" aria-label="信息流广告">
+          <div class="ad-label" style="padding:12px 12px 0">
+            <span>信息流广告</span>
+            <span class="badge">赞助</span>
+          </div>
+          <div class="ad-slot" style="margin:12px">
+            <div><b>1bgp 全球云服务器 / 物理服务器</b></div>
+            <div class="muted">适合部署 AI 题库站、讲义站、作业批改台；也可以搭建“龙虾站”引流页，或对接 ChatGPT 等模型做教学助手。</div>
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+              <a class="mini primary" href="https://www.1bgp.com/" target="_blank" rel="noopener noreferrer" data-event="ad_feed_click">查看配置</a>
+              <a class="mini" href="https://www.1bgp.com/" target="_blank" rel="noopener noreferrer" data-event="ad_feed_contact">进入官网</a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderGrid(){
+      const list = tools.filter(shouldShow);
+      els.activeCat.textContent = state.activeCat;
+      updateCounts(list.length);
+
+      if(list.length === 0){
+        els.grid.innerHTML = `
+          <div class="card" style="grid-column:1 / -1">
+            <div class="card-title">没有匹配结果</div>
+            <p class="card-desc">尝试更换分类或减少关键词，或取消“只看收藏”。</p>
+            <div class="card-actions">
+              <button class="mini primary" type="button" id="resetFilters" data-event="reset_filters">重置筛选</button>
+              <button class="mini" type="button" id="openCtaEmpty" data-event="cta_from_empty">领取题库模板包</button>
+            </div>
+          </div>
+        `;
+        document.getElementById("resetFilters").addEventListener("click", (e) => {
+          track(e.currentTarget);
+          state.activeCat = "全部";
+          state.q = "";
+          state.favOnly = false;
+          els.q.value = "";
+          els.showFavs.textContent = "只看收藏";
+          renderTabs();
+          renderCatQuick();
+          renderGrid();
+          toast("已重置筛选");
+        });
+        document.getElementById("openCtaEmpty").addEventListener("click", (e) => {
+          track(e.currentTarget);
+          toast("示例入口：可替换为资料领取表单/社群二维码");
+        });
+        return;
+      }
+
+      const nodes = [];
+      const insertAt = Math.min(6, list.length);
+      list.forEach((item, idx) => {
+        if(idx === insertAt) nodes.push(renderInlineAd());
+        const fav = state.favs.has(item.name);
+        nodes.push(`
+          <article class="card" data-name="${escapeHtml(item.name)}" data-cat="${escapeHtml(item.cat)}">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title">${escapeHtml(item.name)}</h3>
+                <p class="card-desc">${escapeHtml(item.desc)}</p>
+              </div>
+              <button class="star" type="button" aria-label="收藏" aria-pressed="${fav ? "true" : "false"}" data-fav="${escapeHtml(item.name)}" data-event="fav_toggle">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 17.3 6.2 20.6l1.1-6.6L2.6 9.7l6.6-1 2.8-6 2.8 6 6.6 1-4.7 4.3 1.1 6.6L12 17.3Z" stroke="currentColor" stroke-width="2" opacity="${fav ? "1" : ".7"}" fill="${fav ? "rgba(14,165,233,.30)" : "transparent"}"/>
+                </svg>
+              </button>
+            </div>
+            <div class="tags">
+              <span class="tag">${escapeHtml(item.cat)}</span>
+              ${(item.tags || []).slice(0,3).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}
+            </div>
+            <div class="card-actions">
+              <a class="mini primary" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" data-event="tool_open" data-tool="${escapeHtml(item.name)}">访问</a>
+              <button class="mini" type="button" data-event="tool_copy" data-copy="${escapeHtml(item.name)}｜${escapeHtml(item.url)}">复制链接</button>
+            </div>
+          </article>
+        `);
+      });
+      els.grid.innerHTML = nodes.join("");
+
+      els.grid.querySelectorAll("[data-fav]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          track(e.currentTarget);
+          const name = e.currentTarget.getAttribute("data-fav");
+          if(!name) return;
+          if(state.favs.has(name)) state.favs.delete(name);
+          else state.favs.add(name);
+          saveFavs();
+          renderGrid();
+          toast(state.favs.has(name) ? "已收藏" : "已取消收藏");
+        });
+      });
+
+      els.grid.querySelectorAll("[data-copy]").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          track(e.currentTarget);
+          const text = e.currentTarget.getAttribute("data-copy") || "";
+          try{
+            await navigator.clipboard.writeText(text);
+            toast("已复制到剪贴板");
+          }catch(_){
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            ta.remove();
+            toast("已复制到剪贴板");
+          }
+        });
+      });
+
+      els.grid.querySelectorAll('a[data-event="tool_open"]').forEach(a => {
+        a.addEventListener("click", (e) => {
+          track(e.currentTarget);
+          const name = e.currentTarget.getAttribute("data-tool") || "";
+          pushRecent(name);
+        });
+      });
+
+      els.grid.querySelectorAll('[data-event^="ad_"]').forEach(a => {
+        a.addEventListener("click", (e) => track(e.currentTarget));
+      });
+    }
+
+    function setActiveCat(cat){
+      state.activeCat = cat;
+      renderTabs();
+      renderCatQuick();
+      renderGrid();
+    }
+
+    function init(){
+      loadFavs();
+      els.year.textContent = String(new Date().getFullYear());
+      renderRecommend("recommend");
+      renderTabs();
+      renderCatQuick();
+      renderGrid();
+
+      const recTabs = document.querySelectorAll("[data-rec]");
+      recTabs.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          track(e.currentTarget);
+          const mode = e.currentTarget.getAttribute("data-rec") || "recommend";
+          recTabs.forEach(x => {
+            const active = x === e.currentTarget;
+            x.classList.toggle("active", active);
+            x.setAttribute("aria-selected", active ? "true" : "false");
+          });
+          renderRecommend(mode);
+        });
+      });
+
+      els.q.addEventListener("input", () => {
+        state.q = normalize(els.q.value);
+        renderGrid();
+      });
+
+      els.tabs.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-cat]");
+        if(!btn) return;
+        track(btn);
+        const cat = btn.getAttribute("data-cat");
+        if(!cat) return;
+        setActiveCat(cat);
+      });
+
+      if(els.catQuick){
+        els.catQuick.addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-cat]");
+          if(!btn) return;
+          track(btn);
+          const cat = btn.getAttribute("data-cat");
+          if(!cat) return;
+          setActiveCat(cat);
+        });
+      }
+
+      els.showFavs.addEventListener("click", (e) => {
+        track(e.currentTarget);
+        state.favOnly = !state.favOnly;
+        els.showFavs.textContent = state.favOnly ? "显示全部" : "只看收藏";
+        renderGrid();
+        toast(state.favOnly ? "仅显示收藏" : "显示全部");
+      });
+
+      els.fabTop.addEventListener("click", (e) => {
+        track(e.currentTarget);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      els.submitTool.addEventListener("click", (e) => {
+        track(e.currentTarget);
+        window.open("https://www.1bgp.com/", "_blank", "noopener,noreferrer");
+      });
+
+      els.openDisclaimer.addEventListener("click", (e) => {
+        e.preventDefault();
+        track(e.currentTarget);
+        toast("免责声明：本站内容仅供参考，外链服务与风险由第三方承担。");
+      });
+
+      els.openPrivacy.addEventListener("click", (e) => {
+        e.preventDefault();
+        track(e.currentTarget);
+        toast("隐私政策：收藏与最近使用仅保存在你的浏览器本地，不会上传。");
+      });
+
+      document.querySelectorAll('[data-event^="ad_"]').forEach(a => {
+        a.addEventListener("click", (e) => {
+          track(e.currentTarget);
+        });
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
